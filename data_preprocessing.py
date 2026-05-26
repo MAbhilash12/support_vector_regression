@@ -53,12 +53,27 @@ joblib.dump(label_encoders, "label_encoders.pkl")
 print("Categorical Columns Encoded!")
 
 # =========================
-# FEATURES & TARGET
+# TARGET COLUMN
 # =========================
 
 target_column = 'price'
 
-X = df.drop(target_column, axis=1)
+# =========================
+# IMPORTANT FEATURES ONLY
+# =========================
+
+selected_features = [
+    'fueltype',
+    'carbody',
+    'drivewheel',
+    'horsepower',
+    'enginesize',
+    'curbweight',
+    'citympg',
+    'highwaympg'
+]
+
+X = df[selected_features]
 
 y = df[target_column]
 
@@ -75,6 +90,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # Save test data
 joblib.dump(X_test, "X_test.pkl")
+
 joblib.dump(y_test, "y_test.pkl")
 
 # =========================
@@ -96,6 +112,7 @@ y_train_scaled = scaler_y.fit_transform(
 
 # Save scalers
 joblib.dump(scaler_X, "scaler_X.pkl")
+
 joblib.dump(scaler_y, "scaler_y.pkl")
 
 print("Feature Scaling Completed!")
