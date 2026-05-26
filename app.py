@@ -49,46 +49,99 @@ st.title("🚗 Car Price Prediction using SVR")
 st.write("Enter Car Details Below")
 
 # =========================
-# FEATURES
+# UI LAYOUT
 # =========================
 
-target_column = 'price'
-
-feature_columns = df.drop(target_column, axis=1).columns
-
-input_data = []
+col1, col2 = st.columns(2)
 
 # =========================
-# USER INPUTS
+# COLUMN 1
 # =========================
 
-for column in feature_columns:
+with col1:
 
-    # Categorical Columns
-    if column in label_encoders:
+    fueltype = st.selectbox(
+        "Fuel Type",
+        df['fueltype'].unique()
+    )
 
-        options = df[column].unique()
+    carbody = st.selectbox(
+        "Car Body",
+        df['carbody'].unique()
+    )
 
-        selected_value = st.selectbox(
-            f"Select {column}",
-            options
-        )
+    horsepower = st.slider(
+        "Horsepower",
+        int(df['horsepower'].min()),
+        int(df['horsepower'].max()),
+        int(df['horsepower'].mean())
+    )
 
-        encoder = label_encoders[column]
+    enginesize = st.slider(
+        "Engine Size",
+        int(df['enginesize'].min()),
+        int(df['enginesize'].max()),
+        int(df['enginesize'].mean())
+    )
 
-        encoded_value = encoder.transform([selected_value])[0]
+# =========================
+# COLUMN 2
+# =========================
 
-        input_data.append(encoded_value)
+with col2:
 
-    # Numerical Columns
-    else:
+    drivewheel = st.selectbox(
+        "Drive Wheel",
+        df['drivewheel'].unique()
+    )
 
-        value = st.number_input(
-            f"Enter {column}",
-            value=float(df[column].mean())
-        )
+    curbweight = st.slider(
+        "Curb Weight",
+        int(df['curbweight'].min()),
+        int(df['curbweight'].max()),
+        int(df['curbweight'].mean())
+    )
 
-        input_data.append(value)
+    citympg = st.slider(
+        "City MPG",
+        int(df['citympg'].min()),
+        int(df['citympg'].max()),
+        int(df['citympg'].mean())
+    )
+
+    highwaympg = st.slider(
+        "Highway MPG",
+        int(df['highwaympg'].min()),
+        int(df['highwaympg'].max()),
+        int(df['highwaympg'].mean())
+    )
+
+# =========================
+# ENCODE CATEGORICAL VALUES
+# =========================
+
+fueltype_encoded = label_encoders['fueltype'].transform([fueltype])[0]
+
+carbody_encoded = label_encoders['carbody'].transform([carbody])[0]
+
+drivewheel_encoded = label_encoders['drivewheel'].transform([drivewheel])[0]
+
+# =========================
+# CREATE INPUT ARRAY
+# =========================
+
+input_data = np.array([
+    [
+        fueltype_encoded,
+        carbody_encoded,
+        drivewheel_encoded,
+        horsepower,
+        enginesize,
+        curbweight,
+        citympg,
+        highwaympg
+    ]
+])
 
 # =========================
 # PREDICTION
@@ -96,10 +149,8 @@ for column in feature_columns:
 
 if st.button("Predict Car Price"):
 
-    input_array = np.array(input_data).reshape(1, -1)
-
     # Scale input
-    input_scaled = scaler_X.transform(input_array)
+    input_scaled = scaler_X.transform(input_data)
 
     # Predict scaled value
     prediction_scaled = model.predict(input_scaled)
